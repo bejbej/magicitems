@@ -1,0 +1,141 @@
+<style>
+    body {
+        font-family: sans-serif;
+    }
+
+    .controls {
+        padding: 15px 0px;
+    }
+
+    @media print {
+        body {
+            margin: 0;
+        }
+
+        .hidden-print {
+            display: none;
+        }
+    }
+
+    .page {
+        width: 7.5in;
+        column-count: 2;
+        column-gap: 0.5in;
+    }
+
+    #input {
+        width: 100%;
+        resize: vertical;
+    }
+
+    .table-wrapper {
+        width: 3.5in;
+        margin-bottom: 0.5in;
+        break-inside: avoid;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
+
+    table {
+        border-spacing: 0;
+        width: 100%
+    }
+
+    thead th {
+        border-bottom: 1px solid black;
+    }
+
+    th {
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 4px 8px;
+        font-size: 8pt;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #eee;
+    }
+</style>
+<body>
+    <div class="controls hidden-print">
+        <label># Tables</label>
+        <input id=tables type="number" value=4 min=1>
+        <labe># Items</labe>
+        <input id=items type="number" value=8 min=1>
+        <labe>Max Price</labe>
+        <input id=price type="number" value=1000 step=100 min=0>
+    </div>
+    <div class=page contenteditable="true">
+        <div class="table-wrapper">
+            <h1>Magic Items</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price (gp)</th>
+                        <th>Rarity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+<script src="./index.js"></script>
+<script>
+const page = document.getElementsByClassName("page")[0];
+const tablesInput = document.getElementById("tables");
+const itemsInput = document.getElementById("items");
+const priceInput = document.getElementById("price");
+const tableWrapper = document.getElementsByClassName("table-wrapper")[0];
+tableWrapper.remove();
+
+tablesInput.addEventListener("change", remake);
+itemsInput.addEventListener("change", remake);
+priceInput.addEventListener("change", remake);
+
+loadFromHash();
+remake();
+
+function loadFromHash() {
+    let query = location.hash.slice(1).split("&").reduce((dictionary, item) => {
+        let splits = item.split("=");
+        dictionary[splits[0]] = splits[1];
+        return dictionary;
+    }, {});
+
+    tablesInput.value = parseInt(query["tables"]) || 4;
+    itemsInput.value = parseInt(query["items"]) || 8;
+    priceInput.value = parseInt(query["price"]) || 1000;
+}
+
+function saveToHash() {
+    location.hash = `#tables=${tablesInput.value}&items=${itemsInput.value}&price=${priceInput.value}`;
+}
+
+function remake() {
+    saveToHash();
+    page.innerHTML = "";
+    let numberOfTables = parseInt(tablesInput.value);
+    let numberOfItems = parseInt(itemsInput.value);
+    let maxPrice = parseInt(priceInput.value);
+    for (let i = 0; i < numberOfTables; ++i) {
+        page.appendChild(make(numberOfItems, maxPrice));
+    }
+}
+
+function make(numberOfItems, maxPrice) {
+    let filterFunc = item => item.price <= maxPrice;
+    let items = getItems(numberOfItems, filterFunc);
+    let newTableWrapper = tableWrapper.cloneNode(true);
+    let tbody = newTableWrapper.getElementsByTagName("tbody")[0];
+    tbody.innerHTML = items.map(item => `<tr><td>${item.name}</td><td>${item.price}</td><td>${item.rarity}</td></tr>`).join("");
+    return newTableWrapper;
+}
+</script>

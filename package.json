@@ -1,0 +1,14 @@
+{
+  "name": "magicitems",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node node_modules\\typescript\\lib\\tsc.js --build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.7.5"
+  }
+}

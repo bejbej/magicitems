@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "outFile": "./index.js",
+        "lib": ["es5", "es6", "dom"]
+    },
+    "files": [
+        "src/index.ts",
+        "src/items.ts"
+    ]
+}
